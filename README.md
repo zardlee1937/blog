@@ -21,7 +21,7 @@
 ### Fitness Fantasy 
 - [taptap](https://www.taptap.com/app/64428)
 - [app store](https://itunes.apple.com/app/fitness-fantasy/id1252580641?mt=8)
-- [google play](https://play.google.com/store/apps/details?id=com.shikudo.fitrpg.google)
+- [google play](https://play.google.com/store/apps/details?id=com.shikudo.fitrpg.google)   
  作为Unity3d资深开发编写了：
 - 数值计算模块
 - 骨骼动画/纸娃娃模块
@@ -32,7 +32,7 @@
 ### Pocket Plants
 - [taptap](https://www.taptap.com/app/38919)		
 - [app store](https://itunes.apple.com/app/id1170134874?mt=8)		
-- [google play](https://play.google.com/store/apps/details?id=com.kongregate.mobile.pocketplants.google&hl=en)		
+- [google play](https://play.google.com/store/apps/details?id=com.kongregate.mobile.pocketplants.google&hl=en)   
  作为Unity3d资深开发编写了：
 - 部分UI控件
 - 部分功能逻辑
