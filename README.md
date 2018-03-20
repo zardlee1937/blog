@@ -19,10 +19,10 @@
 ## Shikudo （2016年4月~至今）
 
 ### Fitness Fantasy 
-[taptap](https://www.taptap.com/app/64428)		
-[app store](https://itunes.apple.com/app/fitness-fantasy/id1252580641?mt=8)		
-[google play](https://play.google.com/store/apps/details?id=com.shikudo.fitrpg.google)		
-作为Unity3d资深开发编写了：
+ [taptap](https://www.taptap.com/app/64428)		
+ [app store](https://itunes.apple.com/app/fitness-fantasy/id1252580641?mt=8)		
+ [google play](https://play.google.com/store/apps/details?id=com.shikudo.fitrpg.google)		
+ 作为Unity3d资深开发编写了：
 - 数值计算模块
 - 骨骼动画/纸娃娃模块
 - 新手引导模块
@@ -30,10 +30,10 @@
 - 部分功能逻辑
 
 ### Pocket Plants
-[taptap](https://www.taptap.com/app/38919)		
-[app store](https://itunes.apple.com/app/id1170134874?mt=8)		
-[google play](https://play.google.com/store/apps/details?id=com.kongregate.mobile.pocketplants.google&hl=en)		
-作为Unity3d资深开发编写了：
+ [taptap](https://www.taptap.com/app/38919)		
+ [app store](https://itunes.apple.com/app/id1170134874?mt=8)		
+ [google play](https://play.google.com/store/apps/details?id=com.kongregate.mobile.pocketplants.google&hl=en)		
+ 作为Unity3d资深开发编写了：
 - 部分UI控件
 - 部分功能逻辑
 - 新手引导模块
@@ -43,8 +43,8 @@
 ## Porcelain Knight（ 2012年9月 ~ 2016年1月 ）
 
 ### SpookMash
-[trailer video](http://v.youku.com/v_show/id_XOTUzOTQ5MTQ4.html?from=s1.8-1-1.2)		
-作为Unity3D主程编写了以下模块：
+ [trailer video](http://v.youku.com/v_show/id_XOTUzOTQ5MTQ4.html?from=s1.8-1-1.2)		
+ 作为Unity3D主程编写了以下模块：
 - 战斗逻辑架构
 - 网络架构
 - UI架构
@@ -57,8 +57,8 @@
 该项目曾获2015年Indieplay China最佳设计奖。并通过Steam Green Light。
 
 ### Mechastle Defense
-[trailer video](http://v.youku.com/v_show/id_XNDQ4NTM3MDI4.html?from=s1.8-1-1.2)		
-作为c#程序员编写以下模块：
+ [trailer video](http://v.youku.com/v_show/id_XNDQ4NTM3MDI4.html?from=s1.8-1-1.2)		
+ 作为c#程序员编写以下模块：
 - 自动化测试
 - 配置热加载
  
