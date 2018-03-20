@@ -19,9 +19,9 @@
 ## Shikudo （2016年4月~至今）
 
 ### Fitness Fantasy 
- [taptap](https://www.taptap.com/app/64428)		
- [app store](https://itunes.apple.com/app/fitness-fantasy/id1252580641?mt=8)		
- [google play](https://play.google.com/store/apps/details?id=com.shikudo.fitrpg.google)		
+ [taptap](https://www.taptap.com/app/64428)   
+ [app store](https://itunes.apple.com/app/fitness-fantasy/id1252580641?mt=8)   
+ [google play](https://play.google.com/store/apps/details?id=com.shikudo.fitrpg.google)   
  作为Unity3d资深开发编写了：
 - 数值计算模块
 - 骨骼动画/纸娃娃模块
