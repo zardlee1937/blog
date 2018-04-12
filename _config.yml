@@ -8,8 +8,8 @@ subtitle: all about games
 description:
 keywords: Direct3D Vulkan OpenGL Unity3D Game
 author: L
-language: chinese
-timezone: UTC-8
+language: zh
+#timezone: 
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
@@ -73,9 +73,19 @@ pagination_dir: page
 # Extensions
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
-theme: landscape
+##theme: landscape
+##theme: very-simple
+theme: icer
 
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
-  type:
+  type: git
+  repo: git@github.com:DXGL/dxgl.github.io.git
+  branch: master
+  message: msg
+
+# Search
+search:
+  path: search.json
+  field: post
