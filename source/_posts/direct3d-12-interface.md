@@ -43,22 +43,22 @@ command queue用来提交并执行command list。这种架构方式允许开发�
 * command queue的使用可以使大消耗的操作更有效率。
 
 command queue的结构使接口达成了这些改进:
-* 增加并发：app可以在进行前台工作（如渲染）时，同时进行更深层次的后台工作（如解码视频编码）。
-* 同步执行低优先级的gpu工作：command queue结构允许gpu在一个非同步线程中无锁的执行低优先级gpu工作和原子操作。
-* 高优先级工作：command queue的设计允许脚本打断3d渲染工作，去做少量高优先级计算，以便cpu能够尽早获得结果。
-* 每个command queue只能够保存并提交一个类型的command list。
+1. 增加并发：app可以在进行前台工作（如渲染）时，同时进行更深层次的后台工作（如解码视频编码）。
+2. 同步执行低优先级的gpu工作：command queue结构允许gpu在一个非同步线程中无锁的执行低优先级gpu工作和原子操作。
+3. 高优先级工作：command queue的设计允许脚本打断3d渲染工作，去做少量高优先级计算，以便cpu能够尽早获得结果。
+4. 每个command queue只能够保存并提交一个类型的command list。
 
 ### Descriptor Heaps (DH)
 
 cpu修改创建，用来保存和提交descriptor。
-1. 可以创建完整的heap来保存提交新的descriptor。也可以重新分配空间来修改原有的提交顺序。
-2. 在被command list引用之前，可以直接由cpu编辑修改。但当引用DH的command list被提交后，该DH则不能被修改。
-3. dx12必须通过DH来访问descriptor。
-4. DH可以通过以下策略进行管理：
-    * 为下次draw call填充一个fresh area。在每次command list访问时，移动DT pointer到fresh开头。优点：可以避免记录特定DT pointer的位置。缺点：DH上很可能有许多重复的descriptor，当渲染相同或近似场景时，DH的内存将很快被用完。对于那些在cpu上记录，在gpu上渲染的DH，这种策略需要避免产生访问冲突。(动态填充策略)
-    * 预先根据descriptor的需要创建DH作为一个场景的一部分，之后在绘制时仅仅设置DT即可。
-    * 将DH当作一个包含所有需要的descriptor和其所在位置的大数组。draw call通过index去访问固定区段的heap内容。（预先填充策略）
-5. 确保root constants and root descriptors通过read/write来访问，而非完整的重新创建，可以在大多数硬件上进一步提升DH性能。
+* 可以创建完整的heap来保存提交新的descriptor。也可以重新分配空间来修改原有的提交顺序。
+* 在被command list引用之前，可以直接由cpu编辑修改。但当引用DH的command list被提交后，该DH则不能被修改。
+* dx12必须通过DH来访问descriptor。
+* DH可以通过以下策略进行管理：
+    1. 为下次draw call填充一个fresh area。在每次command list访问时，移动DT pointer到fresh开头。优点：可以避免记录特定DT pointer的位置。缺点：DH上很可能有许多重复的descriptor，当渲染相同或近似场景时，DH的内存将很快被用完。对于那些在cpu上记录，在gpu上渲染的DH，这种策略需要避免产生访问冲突。(动态填充策略)
+    2. 预先根据descriptor的需要创建DH作为一个场景的一部分，之后在绘制时仅仅设置DT即可。
+    3. 将DH当作一个包含所有需要的descriptor和其所在位置的大数组。draw call通过index去访问固定区段的heap内容。（预先填充策略）
+* 确保root constants and root descriptors通过read/write来访问，而非完整的重新创建，可以在大多数硬件上进一步提升DH性能。
 
 #### Descriptor
 
@@ -77,8 +77,6 @@ cpu修改创建，用来保存和提交descriptor。
 
 #### The Direct3d 12 Pipelines
 
-![The render pipeline of ms d3d11 or higher](https://dxgl.github.io/img/pipeline.png "The render pipeline of ms d3d11 or higher")
-
 在说明d3d12 pipeline之前，首先描述一下dx11的render pipeline。本质上，dx12的pipeline是针对该版本的扩展。</br>
 
 d3d11 pipeline大体分为以下阶段：
@@ -90,16 +88,19 @@ d3d11 pipeline大体分为以下阶段：
     * 每个顶点产生一次数据，计算并产生一次输出传给下个阶段。（理论上有毒少个顶点就会有多少次Vertex Shader调用
     * VS一次最大允许16个32位浮点数的传入和传出。
     * VS必须存在并且必须传出一个值。
-3. Tesselator
-    * 实际用来需分区面，在早期管线中，这部分由cpu实现。现在将它移动到gpu。
-    * Tesselator做的事，实在顶点和面数较小的图元上，通过计算增加顶点和面数，并传给下个阶段。
-    * Tesselator阶段的意义在于，可以减少数据的输入和上载数量，但必然的会消耗gpu运算效率。
-    * Tesselator阶段一般由硬件实现，它有两个子的可编程阶段
+3. Tessellation
+    * 实际用来细分区面，在早期管线中，这部分由cpu实现。现在将它移动到gpu。
+    * Tessellation做的事，是顶点和面数较小的图元上，通过计算增加顶点和面数，并传给下个阶段。
+    * Tessellation阶段的意义在于，可以减少数据的输入和上载数量，但必然的会消耗gpu运算效率。
+    * Tessellation阶段一般由硬件实现，它有两个相关的可编程阶段
         1. Hull shader
-            * 每次补充计算调用一次。它将那些定义低细节曲面的控制点，转换成补充的控制点。大多数情况下，是将一个面上的若干个顶点，扩展成很多个，如下图：</br>
-            ![Hull shader calculate paths](https://dxgl.github.io/img/hull-tesselate.png "Calculate Path")
+            * 每个三角面片调用一次。把输入的低面数的控制点，扩展成更高的面数的控制点。比如3个控制点的三角形扩展成9个控制点的三个三角形。从而构成更多的表面细节。
+            * 单次最多输入1-32个控制点。最多输出1-32个控制点，输出的控制点数跟镶嵌参数(tessellation factors)无关。从Hull输出的控制点和面片常量(path constant data)可以被Domain消耗。输出的Tessellation Factors挥别Tesselator使用。
+            * Tessellation factors决定面片被细分的程度。
         2. Domain shader
-
+            * Tesselator每输出一个纹理坐标运行一次。
+            * 使用Hull输出的图元控制点。
+            * 输出顶点位置。
 4. Geometry Shader
 5. Rasterizer
 6. Pixel Shader

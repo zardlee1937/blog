@@ -9,7 +9,12 @@ tags: Untiy3D
 #### 接口
 
 1. 在Unity3D 2017中，Assetstore提供了官方的AssetBundle可视化工具 -- AssetBundle Browser。可以使用图形化界面方便的打包AssetBundle。
-2. 通过BuildPipline.BuildAssetBundle()函数打包。
+2. 通过BuildPipline.BuildAssetBundle()函数打包，例如
+<pre>
+    <code>
+    // 以下代码在Unity3d File菜单下添加一个build按钮来打包bundle
+    </code>
+</pre>
 
 #### 策略
 
