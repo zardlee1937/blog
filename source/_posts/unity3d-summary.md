@@ -1,7 +1,7 @@
 ---
 title: Unity3D总结-AssetBundle
 date: 2018-04-12 12:48:36
-tags: Untiy3D
+tags: Unity3D
 ---
 
 ## 打包
@@ -10,6 +10,7 @@ tags: Untiy3D
 
 1. 在Unity3D 2017中，Assetstore提供了官方的AssetBundle可视化工具 -- AssetBundle Browser。可以使用图形化界面方便的打包AssetBundle。
 2. 通过BuildPipline.BuildAssetBundle()函数打包，例如
+
 <pre>
     <code>
     // 以下代码在Unity3d File菜单下添加一个build按钮来打包bundle
@@ -33,6 +34,7 @@ tags: Untiy3D
     * AssetBundle.LoadFromFile(Path)
     * AssetBundle.LoadFromMemoery(BinaryData)
 2. Netwrok可以使用coutoutine形式，从一个文件路径加载bundle。加载过程异步，并且会创建多个WebStream，适合同时加载多个小块资源。需要注意，使用完成后通过释放Request或WWW来释放WebStream。当加载AssetBundle时，Web方式与NetworkAssetBundle.LoadFromFile速度相差无几，100次平均下来差距在2-8ms左右。例如：
+
 <pre><code>
     // 以下代码加载速度与AssetBundle.LoadFromFile相近
     private IEnumerator WWWLoader()
@@ -51,3 +53,4 @@ tags: Untiy3D
         request = null;
     }
 </code></pre>
+
