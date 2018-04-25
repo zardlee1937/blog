@@ -13,7 +13,29 @@ tags: Unity3D
 
 <pre>
     <code>
-    // 以下代码在Unity3d File菜单下添加一个build按钮来打包bundle
+    // 以下代码在Unity3d Assets菜单下添加一个Build AssetBundls按钮来打包AssetBundle
+    [MenuItem("Assets/Build AssetBundls")]
+    public static void Build()
+    {
+        var bundleList = new List&ltAssetBundleBuild&gt();
+        bundleList.Add(new AssetBundleBuild
+        {
+            addressableNames = new string[]
+            {
+                "path/to/assets/",
+            },
+            assetNames = new string[]
+            {
+                "name/to/assets",
+            },
+            assetBundleName = "Texture",
+            assetBundleVariant = "",
+        });
+        BuildPipeline.BuildAssetBundles(
+            Path.Combine(Path.Combine(Application.streamingAssetsPath, "ABs"), "Custom"),
+            BuildAssetBundleOptions.ForceRebuildAssetBundle,
+            BuildTarget.Android);
+    }
     </code>
 </pre>
 
@@ -33,7 +55,7 @@ tags: Unity3D
     * WWW = new WWW(Path) / UnityWebRequest.GetAssetBundle (两种方式实际都是network streaming形式，这里统称Web方式)
     * AssetBundle.LoadFromFile(Path)
     * AssetBundle.LoadFromMemoery(BinaryData)
-2. Netwrok可以使用coutoutine形式，从一个文件路径加载bundle。加载过程异步，并且会创建多个WebStream，适合同时加载多个小块资源。需要注意，使用完成后通过释放Request或WWW来释放WebStream。当加载AssetBundle时，Web方式与NetworkAssetBundle.LoadFromFile速度相差无几，100次平均下来差距在2-8ms左右。例如：
+2. Web方式可以使用coutoutine形式，从一个文件路径加载bundle。加载过程异步，并且会创建多个WebStream，适合同时加载多个小块资源。需要注意，使用完成后通过释放Request或WWW来释放WebStream。当加载AssetBundle时，Web方式与NetworkAssetBundle.LoadFromFile速度相差无几，100次平均下来差距在2-8ms左右。例如：
 
 <pre><code>
     // 以下代码加载速度与AssetBundle.LoadFromFile相近
@@ -54,3 +76,12 @@ tags: Unity3D
     }
 </code></pre>
 
+3. AssetBundle.LoadFromFile(Path)允许从一个文件中加载AssetBundle。如果该文件来源于网络，则需要先下载该文件到本地存储器，然后再加载。每次加载文件必然会开启一个FileStream，整体开销同正常程序的IO操作。一般情况下，这是加载AssetBundle最快的方式。
+
+<pre><code>
+    // 一下代码使用FileStream加载一个AssetBundle
+    private void Load(string bundleFilePath)
+    {
+        var bundle = AssetBundle.LoadFromFile(bundlePath);
+    }
+</code></pre>
