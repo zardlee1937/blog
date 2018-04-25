@@ -136,18 +136,131 @@ tags: Unity3D
 </code></pre>
 
 当GUI布局能够数据化后，回顾问题分析中关于各种问题的描述，从直观数学上看，anchors+stretch布局从数值上最正确。然而当屏幕改变后，由于长宽比也发生改变，往往按照比例布局，最终得到的结果很容易造成图像的比例失衡，类似于原本的正方形变成了长方形的问题就变得很普遍。</br>
-为了解决这个问题，需要为控件大小引入一个最佳比例的概念。比如100:100的控件，在600x800的显示器中为最佳显示效果，那么不难得到该控件最佳显示比例为1:1。当显示器变更为960x1280时，我们先以控件宽度作为基准，按比例可得100/600x960=160,则在新比例下，控件长宽应为160:160。但有时显示器的长宽比会发生很大变化，导致以宽度作为基准，得到合适的高度比例无法再显示器中显示。比如新的比例为600x90的显示器，按比例计算，100/600x600=100，此时最佳显示比例的控件，高度将高出屏幕。因而在以最佳比例的显示缩放中，仍需要进一步选择长宽中更小的一个作为基准。</br>
-目前市面上移动设备最常见的屏幕尺寸大概3类：
-1. 全面屏
-    * 小米MIX2/2S系列 -- 2160x1080
-    * 三星Galaxy s8/s9 -- 2960x1440
-    * 华为Mate 10 -- 2560x1440
-    * 华为Mate 10 Pro -- 2160x1080
-    * iphoneX -- 2436x1125
-2. 标准
-    * Android VGA -- 800x600/800x480
-    * Android HD -- 1920x1080/1280x720
-    * iphone 6/6P/7/7P/8/8P -- 1334x750
-3. 平板
-    * ipad/ipad mini -- 2048x1536
-    * ipad pro -- 2732x2048/2224x1668
+为了解决这个问题，需要为控件大小引入一个最佳比例的概念。比如100:100的控件，在任何分辨率下，只有1:1的比例，可以得最佳视觉效果，因而按照一边计算在新UI中的长度或宽度，再用比例得到另外一边，就可以使UI控件在更多分辨率下呈现良好效果。</br>
+这里需要注意的是，Unity中，总是以Screen.Height来计算RectTrasnform，因而这里用到的计算方式，也采取这一办法，先按两个显示器比例计算控件高度，再用高度以最佳比例得到宽度，然后再用保存的anchor点对控件位置进行重排。</br>
+
+稍微改动UI重排列的代码，可以使用一套数据，快速适应更多分辨率，具体如下：
+
+<pre><code>
+    private void SetNodeData(RectTransform node, XmlNode data)
+    {
+        // 读取原始数据
+        var x = float.Parse(data.Attributes["x"].Value);
+        var y = float.Parse(data.Attributes["y"].Value);
+        var w = float.Parse(data.Attributes["width"].Value);
+        var h = float.Parse(data.Attributes["height"].Value);
+        var anchor_min = StringToVector2(data.Attributes["anchor-min"].Value);
+        var anchor_max = StringToVector2(data.Attributes["anchor-min"].Value);
+
+        // stretch模式，按比例适配控件
+        var X = x / rootSize.x * Width;
+        var Y = y / rootSize.y * Height;
+        var W = w / rootSize.x * Width;
+        var H = h / rootSize.y * Height;
+        var origin = new Rect(X, Y, W, H);
+
+        // 先恢复anchors
+        node.anchorMin = anchor_min;
+        node.anchorMax = anchor_max;
+        node.ForceUpdateRectTransforms();
+
+        // 把UI约束在屏幕内
+        W = w / h * H;
+        var current = new Rect(X, Y, W, H);
+
+        var align = PickSortingPoint(node);
+        var pos = CalculateAnchorPos(align, origin, current);
+
+        node.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, W);
+        node.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, H);
+        node.anchoredPosition = pos;
+    }
+    
+    private Vector2 CalculateAnchorPos(UGUIGenAlignment align, Rect o, Rect c)
+    {
+        var result = new Vector2(c.x, c.y);
+
+        switch (align)
+        {
+            case UGUIGenAlignment.RightTop:
+            {
+                result.x += (o.width - c.width) * 0.5f;
+                result.y += (o.height - c.height) * 0.5f;
+                break;
+            }
+            case UGUIGenAlignment.RightMid:
+            {
+                result.x += (o.width - c.width) * 0.5f;
+                if (result.y > 0)
+                    result.y -= (o.height - c.height) * 0.5f;
+                if (result.y < 0)
+                    result.y += (o.height - c.height) * 0.5f;
+                break;
+            }
+            case UGUIGenAlignment.RightBottom:
+            {
+                result.x += (o.width - c.width) * 0.5f;
+                result.y -= (o.height - c.height) * 0.5f;
+                break;
+            }
+            case UGUIGenAlignment.MidTop:
+            {
+                if (result.x < 0)
+                    result.x += (o.width - c.width) * 0.5f;
+                if (result.x > 0)
+                    result.x -= (o.width - c.width) * 0.5f;
+                result.y += (o.height - c.height) * 0.5f;
+                break;
+            }
+            case UGUIGenAlignment.Center:
+            {
+                if (result.x < 0)
+                    result.x += (o.width - c.width) * 0.5f;
+                if (result.x > 0)
+                    result.x -= (o.width - c.width) * 0.5f;
+                if (result.y > 0)
+                    result.y -= (o.height - c.height) * 0.5f;
+                if (result.y < 0)
+                    result.y += (o.height - c.height) * 0.5f;
+                break;
+            }
+            case UGUIGenAlignment.MidBottom:
+            {
+                if (result.x < 0)
+                    result.x += (o.width - c.width) * 0.5f;
+                if (result.x > 0)
+                    result.x -= (o.width - c.width) * 0.5f;
+                result.y -= (o.height - c.height) * 0.5f;
+                break;
+            }
+            case UGUIGenAlignment.LeftTop:
+            {
+                result.x -= (o.width - c.width) * 0.5f;
+                result.y += (o.height - c.height) * 0.5f;
+                break;
+            }
+            case UGUIGenAlignment.LeftMid:
+            {
+                result.x -= (o.width - c.width) * 0.5f;
+                if (result.y > 0)
+                    result.y -= (o.height - c.height) * 0.5f;
+                if (result.y < 0)
+                    result.y += (o.height - c.height) * 0.5f;
+                break;
+            }
+            case UGUIGenAlignment.LeftBottom:
+            {
+                result.x -= (o.width - c.width) * 0.5f;
+                result.y -= (o.height - c.height) * 0.5f;
+                break;
+            }
+        }
+        return result;
+    }
+
+</code></pre>
+
+重排的效果大体如下图：
+![5](/image/5.png)
+
+完整的项目链接可以点击[这里](https://github.com/zardlee1937/UGUIResorting)查看下载。
