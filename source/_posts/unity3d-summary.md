@@ -51,6 +51,8 @@ tags: Unity3D
 
 ## 加载
 
+#### 加载AssetBundle
+
 1. 加载的核心接口一共三个
     * WWW = new WWW(Path) / UnityWebRequest.GetAssetBundle (两种方式实际都是network streaming形式，这里统称Web方式)
     * AssetBundle.LoadFromFile(Path)
@@ -76,12 +78,18 @@ tags: Unity3D
     }
 </code></pre>
 
+    PS:WebRequest中，无法通过Dispose接口主动释放WebStream，最终会通过Finalize来释放。一定程度上或许会造成GC压力。可以自行测试确定效率。
+
 3. AssetBundle.LoadFromFile(Path)允许从一个文件中加载AssetBundle。如果该文件来源于网络，则需要先下载该文件到本地存储器，然后再加载。每次加载文件必然会开启一个FileStream，整体开销同正常程序的IO操作。一般情况下，这是加载AssetBundle最快的方式。
 
 <pre><code>
-    // 一下代码使用FileStream加载一个AssetBundle
+    // 以下代码使用FileStream加载一个AssetBundle
     private void Load(string bundleFilePath)
     {
         var bundle = AssetBundle.LoadFromFile(bundlePath);
     }
 </code></pre>
+
+    PS:值得注意的是，AssetBundle.LoadFromFile会创建一个FileStream，连续调用多次可能会引起GC峰值。
+
+4. AssetBundle.LoadFromMemoery(BinaryData)正常情况是几种方式中加载最慢的一个。但在实际使用中，程序本质上需要的是AssetBundle中的Resources，AssetBundle本身则并不是很需要。保有一份AssetBundle必然会造成内存开销，因此一些场景中，加载完AssetBundle中的Resources之后，需要释放掉Bundle本身。AssetBundle.LoadFromMemoery(BinaryData)适用于加载已经加载过，或者需要重复加载/卸载的AssetBundle。
